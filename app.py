@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Simulasi data laporan transaksi
+# TRansaction Date Simulation
 CSV_FILE = "transactions.csv"
 if not os.path.exists(CSV_FILE):
     data = {
@@ -16,12 +16,12 @@ if not os.path.exists(CSV_FILE):
     df = pd.DataFrame(data)
     df.to_csv(CSV_FILE, index=False)
 
-# Route untuk halaman utama
+# Route for main page
 @app.route("/")
 def index():
     return render_template("index.html")
 
-# Endpoint untuk mendapatkan transaksi berdasarkan rentang tanggal
+# Endpoint to get transaction based on date range
 @app.route("/transactions", methods=["GET"])
 def get_transactions():
     start_date = request.args.get("start_date")
