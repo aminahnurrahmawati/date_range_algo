@@ -1,0 +1,6 @@
+transaction_id,date,amount,description
+1,2024-11-20,100,Purchase A
+2,2024-11-21,200,Purchase B
+3,2024-11-22,150,Purchase C
+4,2024-11-23,300,Purchase D
+5,2024-11-24,250,Purchase E

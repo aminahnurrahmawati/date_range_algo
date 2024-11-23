@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Report</title>
+    <!-- Include Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Transaction Report</h1>
+    <div class="form-group">
+        <label for="daterange">Select Date Range:</label>
+        <input type="text" id="daterange" placeholder="Choose date range">
+    </div>
+    <button id="filterBtn">Filter Transactions</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody id="transactionsTable">
+            <tr>
+                <td colspan="4">No data available</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Include Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Initialize date range picker
+        flatpickr("#daterange", {
+            mode: "range",
+            dateFormat: "Y-m-d"
+        });
+
+        document.getElementById("filterBtn").addEventListener("click", async () => {
+            const dateRange = document.getElementById("daterange").value.split(" to ");
+            if (dateRange.length < 2) {
+                alert("Please select a valid date range.");
+                return;
+            }
+
+            const [start_date, end_date] = dateRange;
+
+            try {
+                const response = await fetch(`/transactions?start_date=${start_date}&end_date=${end_date}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    updateTable(data);
+                } else {
+                    const error = await response.json();
+                    alert("Error: " + error.error);
+                }
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Failed to fetch transactions.");
+            }
+        });
+
+        function updateTable(data) {
+            const tableBody = document.getElementById("transactionsTable");
+            tableBody.innerHTML = "";
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4">No transactions found for the selected date range</td></tr>`;
+                return;
+            }
+
+            data.forEach(transaction => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${transaction.transaction_id}</td>
+                    <td>${transaction.date}</td>
+                    <td>${transaction.amount}</td>
+                    <td>${transaction.description}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
